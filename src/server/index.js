@@ -7,15 +7,11 @@ const cookieParser = require('cookie-parser');
 const cors = require('cors');
 const history = require('connect-history-api-fallback');
 
-const clubowners = require('./routes/clubowners');
-const clubs = require('./routes/clubs');
-const students = require('./routes/students');
-
 require('dotenv').config();
 
 if (process.env.NODE_ENV === "production") {
   app.use(cors({
-    origin: 'https://mern-club-fair-signup.herokuapp.com/',
+    origin: '#',
     optionsSuccessStatus: 200
   }));
   app.use(history({
@@ -26,10 +22,6 @@ app.use(bodyParser.urlencoded());
 app.use(bodyParser.json());
 app.use(express.static('dist'));
 app.use(cookieParser());
-
-app.use("/clubs", clubs);
-app.use("/clubowners", clubowners);
-app.use("/students", students);
 
 const uri = process.env.MONGO_URI;
 mongoose.connect(uri, { useNewUrlParser: true });
