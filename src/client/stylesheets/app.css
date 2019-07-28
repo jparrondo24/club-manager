@@ -1,0 +1,34 @@
+body {
+  background-color: #262323;
+  font-family: 'Roboto Mono', monospace;
+}
+
+h1, h2, h3, p, button {
+  color: #06cf10;
+}
+
+.app {
+  margin-top: 20px;
+}
+
+.alert {
+  background-color: inherit;
+}
+
+.alert-success {
+  color: #06cf10;
+  border-color: #06cf10
+}
+
+.alert-danger {
+  color: red;
+  border-color: red;
+}
+
+.alert-success button {
+  color: #06cf10 !important;
+}
+
+.alert-danger button {
+  color: red !important;
+}
