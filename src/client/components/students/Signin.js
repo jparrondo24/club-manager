@@ -14,7 +14,7 @@ export default class Signin extends React.Component {
     };
   }
   componentWillMount() {
-    const socket = openSocket((process.env.MY_URL || 'http://localhost') + ":" + 80);
+    const socket = openSocket((process.env.MY_URL || 'http://localhost'));
     socket.on('error', (error) => {
       this.props.handleNewFlashMessage({
         message: error,
