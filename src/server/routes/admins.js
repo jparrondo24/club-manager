@@ -30,7 +30,9 @@ router.post("/register", validateRegisterFields, (req, res) => {
     email: req.body.email,
     password: req.body.password
   });
-  // Use bcrypt to create a hashed password
+  if (req.body.masterPassword != process.env.MASTER_PASSWORD) {
+    return res.status(403).json({ error: "Master password incorrect" });
+  }
   bcrypt.genSalt(10, (err, salt) => {
     bcrypt.hash(newAdmin.password, salt, (err, hash) => {
       newAdmin.password = hash;

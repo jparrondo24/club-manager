@@ -20,6 +20,11 @@ button {
   margin-bottom: 10px;
 }
 
+.meeting-button {
+  margin-top: 10px;
+  margin-bottom: 10px;
+}
+
 .form-input {
   color: white !important;
   background-color: inherit !important;
@@ -48,4 +53,8 @@ button {
 
 ::-ms-input-placeholder { /* Microsoft Edge */
   color: #04900B !important;
+}
+
+#home-button {
+  margin-top: 30px;
 }

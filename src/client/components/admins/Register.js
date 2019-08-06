@@ -9,7 +9,8 @@ export default class Register extends React.Component {
     this.state = {
       name: '',
       email: '',
-      password: ''
+      password: '',
+      masterPassword: ''
     }
     this.handleChange = this.handleChange.bind(this);
     this.handleSubmit = this.handleSubmit.bind(this);
@@ -82,6 +83,17 @@ export default class Register extends React.Component {
               className="form-input"
               type="password"
               placeholder="Enter password"
+            />
+          </Form.Group>
+          <Form.Group controlId="masterPassword">
+            <Form.Label>Master Password</Form.Label>
+            <Form.Control
+              name="masterPassword"
+              onChange={this.handleChange}
+              value={this.state.masterPassword}
+              className="form-input"
+              type="password"
+              placeholder="Enter master password"
             />
           </Form.Group>
           <Button variant="primary" type="submit">

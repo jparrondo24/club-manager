@@ -1,0 +1,15 @@
+table {
+  text-align: left;
+}
+
+tr {
+  color: white;
+}
+
+p {
+  font-size: 20px;
+}
+
+.hidden-text {
+  color: white;
+}

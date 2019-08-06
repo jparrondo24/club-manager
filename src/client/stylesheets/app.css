@@ -32,3 +32,12 @@ h1, h2, h3, p, button {
 .alert-danger button {
   color: red !important;
 }
+
+.button-group {
+  margin-top: 20px;
+  margin-bottom: 20px;
+}
+
+.button-group button {
+  margin-top: 10px;
+}

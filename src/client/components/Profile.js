@@ -3,6 +3,7 @@ import axios from 'axios';
 import FieldEditor from './FieldEditor.js';
 import '../stylesheets/form.css';
 import { Button, Form, Row, Col } from 'react-bootstrap';
+import { Link } from 'react-router-dom';
 
 export default class Profile extends React.Component {
   constructor(props) {
@@ -134,7 +135,7 @@ export default class Profile extends React.Component {
         message: data.success,
         isSuccess: true
       });
-      this.props.history.push('/' + this.props.model.slice(0, -1) + '/login');
+      this.props.history.push('/');
     }).catch((err) => {
       if (err.response) {
         const { data } = err.response;
@@ -259,6 +260,10 @@ export default class Profile extends React.Component {
           </Button>
         </Form>
         <Button onClick={this.handleDeleteClick} className="profile-button">Delete Account <i className="fa fa-warning"></i></Button>
+        <br />
+        <Link to="/">
+          <Button id="home-button">Go Back Home <i className="fa fa-home"></i></Button>
+        </Link>
       </div>
     );
   }

@@ -1,0 +1,26 @@
+.calendar .react-calendar__month-view__weekdays {
+  text-align: center;
+  border-style: solid;
+  box-sizing: border-box;
+  border-width: 2px;
+  color: #06cf10;
+}
+
+.calendar {
+  margin-top: 15px;
+}
+
+.meeting {
+  color: white !important;
+}
+.past-date {
+  color: #dae639 !important;
+}
+
+.date-editor {
+  margin-top: 20px;
+}
+
+table {
+  margin-top: 0;
+}
