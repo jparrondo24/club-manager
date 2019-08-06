@@ -1,7 +1,7 @@
 import React from 'react';
 import openSocket from 'socket.io-client';
 import StudentTable from '../StudentTable.js';
-import '../../stylesheets/signin.css'
+import '../../stylesheets/signin.css';
 
 export default class Signin extends React.Component {
   constructor(props) {
