@@ -14,7 +14,7 @@ export default class Signin extends React.Component {
     };
   }
   componentWillMount() {
-    const socket = openSocket((process.env.MY_URL || 'http://localhost'));
+    const socket = openSocket(('http://localhost:8080'));
     socket.on('error', (error) => {
       this.props.handleNewFlashMessage({
         message: error,
@@ -50,7 +50,8 @@ export default class Signin extends React.Component {
       this.setState({
         date: new Date(meeting.date),
         startTime: new Date(meeting.startTime),
-        endTime: new Date(meeting.endTime)
+        endTime: new Date(meeting.endTime),
+        joinCode: meeting.joinCode
       });
     });
   }
@@ -63,10 +64,11 @@ export default class Signin extends React.Component {
           + "-" + new Date(this.state.endTime).toLocaleTimeString('en-US', timeOptions) : null;
 
     return (
-      <div className="admin-signin">
+      <div className="signin">
         <h1>Coding Club Sign-in</h1>
         <h2>{dateString} {timeString}</h2>
         <p>Go to <a href="cchs-coding.club"> cchs-coding.club</a> to sign-in!</p>
+        <h3>Join Code: {this.state.joinCode}</h3>
         <StudentTable students={this.state.students}/>
       </div>
     );

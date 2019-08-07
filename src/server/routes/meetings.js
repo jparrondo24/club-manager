@@ -3,6 +3,7 @@ const router = express.Router();
 const mongoose = require("mongoose");
 const mailer = require('../mailer.js');
 const CronJob = require('cron').CronJob;
+const fs = require('fs');
 
 const Meeting = require('../models/Meeting');
 const Student = require('../models/Student.js');
@@ -100,6 +101,7 @@ router.post('/', (req, res) => {
     endTime: req.body.endTime,
     lastEditedBy: req.admin._id
   });
+  
   newMeeting.save((err) => {
     if (err) {
       let { message } = err;

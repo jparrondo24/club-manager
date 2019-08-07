@@ -310,7 +310,7 @@ export default class MeetingManager extends React.Component {
         );
       }
       let button = null;
-      if (new Date(this.state.activeDate) > new Date()) {
+      if (new Date(this.state.activeDate).getDate() >= new Date().getDate()) {
         button = (
           <Button onClick={this.handleScheduleButton}>Schedule Meeting <i className={iconClass}></i></Button>
         );

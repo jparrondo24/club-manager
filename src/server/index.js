@@ -130,6 +130,10 @@ io.use((socket, next) => {
       }
 
       socket.meeting = meeting;
+      if (!socket.handshake.headers.cookie) {
+        socket.handshake.headers.cookie = "";
+      }
+
       const cookies = cookie.parse(socket.handshake.headers.cookie);
       const studentAccessToken = cookies['studentAccessJwt'];
       const adminAccessToken = cookies['adminAccessJwt'];
@@ -174,6 +178,7 @@ io.use((socket, next) => {
 
 io.on('connection', (socket) => {
   if (socket.admin) {
+    console.log(socket.meeting);
     socket.emit('meetingData', socket.meeting);
     socket.meeting.attendants.forEach((attendant) => {
       const attendantObject = attendant.toObject();
@@ -181,23 +186,34 @@ io.on('connection', (socket) => {
       socket.emit('studentSignedIn', attendantObject);
     });
   } else if (socket.student) {
-    socket.emit('meetingData', socket.meeting);
-    socket.emit('studentDetected');
-    const student = socket.student.toObject();
-    const attendants = socket.meeting.toObject().attendants;
-    let isAlreadyInDb = false;
-    for (let i = 0; i < attendants.length; i++) {
-      if (attendants[i]._id+"" === student._id+"") {
-        isAlreadyInDb = true;
+    const meetingData = socket.meeting.toObject();
+    delete meetingData.joinCode;
+    socket.emit('meetingData', meetingData);
+
+    socket.on('joinCodeSubmit', (data) => {
+      console.log("here");
+      if (data.joinCode.toLowerCase() === socket.meeting.joinCode.toLowerCase()) {
+        const student = socket.student.toObject();
+        const attendants = socket.meeting.toObject().attendants;
+        let isAlreadyInDb = false;
+        for (let i = 0; i < attendants.length; i++) {
+          if (attendants[i]._id+"" === student._id+"") {
+            isAlreadyInDb = true;
+          }
+        }
+        if (!isAlreadyInDb) {
+          socket.meeting.attendants.push(student);
+          socket.meeting.save((err) => {
+            if (err) throw err;
+          })
+        }
+        delete student.password;
+        socket.emit('studentDetected');
+        io.sockets.emit('studentSignedIn', student);
+      } else {
+        console.log("here");
+        socket.emit('incorrectCode');
       }
-    }
-    if (!isAlreadyInDb) {
-      socket.meeting.attendants.push(student);
-      socket.meeting.save((err) => {
-        if (err) throw err;
-      })
-    }
-    delete student.password;
-    io.sockets.emit('studentSignedIn', student);
+    });
   }
 });

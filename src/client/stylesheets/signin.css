@@ -1,12 +1,57 @@
-.admin-signin {
+.signin {
   text-align: center;
 }
 
 table {
-  margin-top: 50px;
+  margin-top: 60px;
+}
+
+h3 {
+  margin-bottom: 20px;
+  color: white !important;
 }
 
 #status {
   margin-top: 20px;
   color: white;
+}
+
+.signin form {
+  margin-top: 40px;
+  color: white;
+}
+
+.signin form label {
+  color: white;
+}
+
+.signin form button {
+  color: white !important;
+  border-color: white !important;
+}
+
+.signin input {
+  color: white !important;
+  background-color: inherit !important;
+  border: none !important;
+  border-bottom-style: solid !important;
+  border-bottom-width: 2px !important;
+  border-bottom-color: #4C4C4C !important;
+  border-radius: 0px;
+  transition-property: none !important;
+  transition-duration: 0s !important;
+  box-shadow: none !important;
+}
+
+::placeholder { /* Chrome, Firefox, Opera, Safari 10.1+ */
+  color: #b0b0b0 !important;
+  opacity: 1 !important; /* Firefox */
+}
+
+:-ms-input-placeholder { /* Internet Explorer 10-11 */
+  color: #b0b0b0 !important;
+}
+
+::-ms-input-placeholder { /* Microsoft Edge */
+  color: #b0b0b0 !important;
 }
