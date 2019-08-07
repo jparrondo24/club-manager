@@ -7,13 +7,12 @@ function generateJoinCode() {
     fs.readFile('src/server/wordlists/adjectives.txt', (err, data) => {
       if (err) throw err;
       const adjectiveFile = data.toString().split('\n');
-      let randomAdjective = adjectiveFile[Math.floor(Math.random()*adjectiveFile.length)];
-      randomAdjective = randomAdjective.charAt(0).toUpperCase() + randomAdjective.slice(1);
+      const randomAdjective = adjectiveFile[Math.floor(Math.random()*adjectiveFile.length)];
       fs.readFile('src/server/wordlists/animals.txt', (err, data) => {
         if (err) throw err;
         const animalFile = data.toString().split('\n');
-        const randomAnimal = animalFile[Math.floor(Math.random()*animalFile.length)];
-        resolve(randomAdjective + " " + randomAnimal);
+        const randomAnimal = animalFile[Math.floor(Math.random()*animalFile.length)].toLowerCase();
+        resolve(randomAdjective + "_" + randomAnimal);
       });
     })
   });

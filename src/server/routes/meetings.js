@@ -36,7 +36,7 @@ const job = new CronJob('4 23 * * *', () => {
 
 router.get('/', (req, res) => {
   if (!req.student && !req.admin) {
-    return res.status(403).json({ error: "You are not authorized!", status: "notAuthorized" });
+    return res.status(403).json({ error: "You are not signed in!", status: "notAuthorized" });
   }
 
   Meeting
@@ -101,7 +101,7 @@ router.post('/', (req, res) => {
     endTime: req.body.endTime,
     lastEditedBy: req.admin._id
   });
-  
+
   newMeeting.save((err) => {
     if (err) {
       let { message } = err;
