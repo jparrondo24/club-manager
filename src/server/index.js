@@ -205,7 +205,7 @@ io.on('connection', (socket) => {
           socket.meeting.attendants.push(student);
           socket.meeting.save((err) => {
             if (err) throw err;
-          })
+          });
         }
         delete student.password;
         socket.emit('studentDetected');

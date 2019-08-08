@@ -53,12 +53,16 @@ const MeetingSchema = new Schema({
 MeetingSchema.pre('save', function(next) {
   const self = this;
   console.log(self);
-  generateJoinCode().then((code) => {
-    console.log(code);
-    this.joinCode = code;
-    console.log(this);
+  if (!this.joinCode) {
+    generateJoinCode().then((code) => {
+      console.log(code);
+      this.joinCode = code;
+      console.log(this);
+      next();
+    });
+  } else {
     next();
-  });
+  }
 });
 
 module.exports = Meeting = mongoose.model("Meeting", MeetingSchema);
