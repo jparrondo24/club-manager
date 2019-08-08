@@ -7,6 +7,8 @@ const cookie = require('cookie');
 const cors = require('cors');
 const history = require('connect-history-api-fallback');
 const jwt = require('jsonwebtoken');
+const sslRedirect = require('heroku-ssl-redirect');
+
 
 const students = require('./routes/students.js');
 const admins = require('./routes/admins.js');
@@ -27,6 +29,7 @@ if (process.env.NODE_ENV === "production") {
     verbose: true
   }));
 }
+app.use(sslRedirect());
 app.use(bodyParser.urlencoded());
 app.use(bodyParser.json());
 app.use(cookieParser());
