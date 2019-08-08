@@ -28,6 +28,7 @@ h3 {
 .signin form button {
   color: white !important;
   border-color: white !important;
+  margin-top: 20px;
 }
 
 .signin input {
@@ -41,6 +42,7 @@ h3 {
   transition-property: none !important;
   transition-duration: 0s !important;
   box-shadow: none !important;
+  text-align: center;
 }
 
 ::placeholder { /* Chrome, Firefox, Opera, Safari 10.1+ */

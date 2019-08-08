@@ -90,8 +90,8 @@ export default class Signin extends React.Component {
             </Col>
             <Col sm="2" md="3" lg="4"/>
           </Row>
+          <Button type="submit">Submit <i className="fa fa-paper-plane"></i></Button>
         </Form.Group>
-        <Button type="submit">Submit <i className="fa fa-paper-plane"></i></Button>
       </Form>
     );
     const statusMessage = this.state.isSignedIn ? (<p id="status">You should now be signed-in. Look up to see your name on the board</p>) : null;
