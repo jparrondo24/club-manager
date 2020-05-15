@@ -113,7 +113,7 @@ export default class MeetingManager extends React.Component {
         });
       }
       const startDateHour = this.state.startTime.split(":")[0];
-      const startDateMinutes = this.state.endTime.split(":")[1];
+      const startDateMinutes = this.state.startTime.split(":")[1];
       const endDateHour = this.state.endTime.split(":")[0];
       const endDateMinutes = this.state.endTime.split(":")[1];
 
@@ -175,7 +175,7 @@ export default class MeetingManager extends React.Component {
         });
       }
       const startDateHour = this.state.startTime.split(":")[0];
-      const startDateMinutes = this.state.endTime.split(":")[1];
+      const startDateMinutes = this.state.startTime.split(":")[1];
       const endDateHour = this.state.endTime.split(":")[0];
       const endDateMinutes = this.state.endTime.split(":")[1];
 
