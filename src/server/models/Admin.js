@@ -23,6 +23,15 @@ const AdminSchema = new Schema({
     type: String,
     required: 'Password is required'
   },
+  zoomAccessToken: {
+    type: String
+  }, 
+  zoomRefreshToken: {
+    type: String
+  },
+  zoomTokenExpireTime: {
+    type: Date
+  },
   date: {
     type: Date,
     default: Date.now

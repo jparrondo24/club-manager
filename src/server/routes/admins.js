@@ -3,9 +3,66 @@ const router = express.Router();
 const bcrypt = require("bcryptjs");
 const jwt = require("jsonwebtoken");
 const mongoose = require("mongoose");
+const url = require('url');
+const axios = require('axios');
+
 require('dotenv').config();
 
 const Admin = require('../models/Admin');
+
+router.get('/auth/zoom', (req, res) => {
+  if (!req.admin) {
+    return res.status(403).json({ error: "Only Admins may sign into Zoom" });
+  }
+  res.redirect(url.format({
+    pathname: 'https://zoom.us/oauth/authorize',
+    query: {
+      response_type: 'code',
+      redirect_uri: req.protocol + "://" + req.headers.host + '/api/admins/auth/zoom/callback',
+      client_id: process.env.ZOOM_CLIENT_ID
+    }
+  }));
+});
+
+router.get('/auth/zoom/callback', (req, res) => {
+  if (!req.admin) {
+    return res.status(403).json({ error: "You must be an admin to sign into Zoom" })
+  }
+
+  const code = req.query.code;
+  const authHeader = Buffer.from(process.env.ZOOM_CLIENT_ID + ":" + process.env.ZOOM_CLIENT_SECRET).toString('base64');
+
+  axios({
+    method: 'POST',
+    url: 'https://zoom.us/oauth/token',
+    params: {
+      grant_type: 'authorization_code',
+      code: code,
+      redirect_uri: req.protocol + "://" + req.headers.host + '/api/admins/auth/zoom/callback'
+    },
+    headers: {
+      'Authorization' : "Basic " + authHeader
+    }
+  }).then((response) => {
+    const { data } = response;
+    Admin.findById(req.admin.id, (err, admin) => {
+      if (err) throw err;
+      admin.zoomAccessToken = data.access_token;
+      admin.zoomRefreshToken = data.refresh_token;
+
+      let expireTime = new Date();
+      expireTime.setSeconds(expireTime.getSeconds() + 3500);
+      admin.zoomTokenExpireTime = expireTime.toISOString();
+      
+      admin.save((err) => {
+        if (err) throw err;
+        res.redirect('/meetings');
+      })
+    });
+  }).catch((err) => {
+    return res.status(500).json({ error: "Could not access the access token, most likely due to bad environment variables" })
+  });
+})
 
 const validateRegisterFields = (req, res, next) => {
   const emailRegex = /^\w+([\.-]?\w+)*@\w+([\.-]?\w+)*(\.\w{2,3})+$/;
@@ -93,12 +150,19 @@ router.get('/', (req, res) => {
   if (req.admin) {
     let admin = req.admin.toObject();
     delete admin.password;
+    
+    if (req.admin.zoomAccessToken && req.admin.zoomRefreshToken) {
+      delete admin.zoomAccessToken
+      delete admin.zoomRefreshToken
+      delete admin.zoomTokenExpireTime
+      admin.hasZoomToken = true;
+    }
 
     return res.json({
       user: admin
     });
   } else {
-    Student.find({}, (err, admins) => {
+    Admin.find({}, (err, admins) => {
       let responseAdmins = [];
       for (let i = 0; i < admins.length; i++) {
         let currAdmin = admins[i].toObject();
@@ -106,8 +170,8 @@ router.get('/', (req, res) => {
         responseAdmins.push(currAdmin);
       }
       return res.json({
-        status: "noStudentToken",
-        students: responseAdmins
+        status: "noAdmintToken",
+        admins: responseAdmins
       });
     });
   }
@@ -128,7 +192,7 @@ const protectRoute = (req, res, next) => {
 router.get('/:id', protectRoute, (req, res) => {
   Admin.findOne({ _id: req.params.id }, (err, admin) => {
     if (err) throw err;
-    if (!admin) return res.status(400).json({ error: "Student could not be found by that ID" });
+    if (!admin) return res.status(400).json({ error: "Admin could not be found by that ID" });
     let responseAdmin = admin.toObject();
     delete responseAdmin.password;
     return res.json({

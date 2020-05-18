@@ -40,6 +40,18 @@ const MeetingSchema = new Schema({
   joinCode: {
     type: String
   },
+  zoomMeetingId: {
+    type: String
+  },
+  zoomMeetingStartLink: {
+    type: String
+  },
+  zoomMeetingInviteLink: {
+    type: String
+  },
+  zoomMeetingPassword: {
+    type: String
+  },
   lastEditedBy: {
     type: Schema.Types.ObjectId,
     ref: 'Admin'

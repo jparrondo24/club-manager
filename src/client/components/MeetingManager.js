@@ -2,6 +2,8 @@ import React from 'react';
 import axios from 'axios';
 import Calendar from 'react-calendar/dist/entry.nostyle';
 import { Row, Col, Button, Form } from 'react-bootstrap';
+import { Link } from 'react-router-dom';
+import { CopyToClipboard } from 'react-copy-to-clipboard';
 import StudentTable from './StudentTable';
 import '../stylesheets/meetings.css';
 import '../stylesheets/form.css';
@@ -14,7 +16,8 @@ export default class MeetingManager extends React.Component {
       isSchedulingMeeting: false,
       isReschedulingMeeting: false,
       startTime: '',
-      endTime: ''
+      endTime: '',
+      hasZoomMeeting: false
     };
     this.handleCalendarChange = this.handleCalendarChange.bind(this);
     this.handleScheduleButton = this.handleScheduleButton.bind(this);
@@ -22,6 +25,7 @@ export default class MeetingManager extends React.Component {
     this.handleDateInputChange = this.handleDateInputChange.bind(this);
     this.handleCancelButton = this.handleCancelButton.bind(this);
     this.handleRescheduleButton = this.handleRescheduleButton.bind(this);
+    this.handleCheckboxChange = this.handleCheckboxChange.bind(this);
   }
 
 
@@ -46,7 +50,15 @@ export default class MeetingManager extends React.Component {
           this.props.history.push('/student/login');
         }
       }
-    })
+    });
+    axios({
+      method: 'GET',
+      url: '/api/admins',
+      withCredentials: true
+    }).then((response) => {
+      const { data } = response;
+      this.state.admin = data.user;
+    });
   }
 
   handleCalendarChange(value) {
@@ -72,6 +84,11 @@ export default class MeetingManager extends React.Component {
       endTime = new Date(currMeeting.endTime).toLocaleTimeString('en-US', options);
     }
 
+    let zoomMeetingStartLink = '';
+    if (currMeeting && currMeeting.zoomMeetingStartLink) {
+      zoomMeetingStartLink = currMeeting.zoomMeetingStartLink;
+    }
+
     this.setState({
       activeDate: value,
       isMeeting: (currMeeting ? true : false),
@@ -79,6 +96,9 @@ export default class MeetingManager extends React.Component {
       endTime: endTime,
       newDate: value,
       meetingId: (currMeeting ? currMeeting._id : ''),
+      zoomMeetingStartLink: zoomMeetingStartLink,
+      zoomMeetingInviteLink: (currMeeting ? currMeeting.zoomMeetingInviteLink : ''),
+      zoomMeetingPassword: (currMeeting ? currMeeting.zoomMeetingPassword: ''),
       attendants: (currMeeting ? currMeeting.attendants : [])
     });
   }
@@ -86,6 +106,12 @@ export default class MeetingManager extends React.Component {
   handleInputChange(event) {
     this.setState({
       [event.target.name]: event.target.value
+    });
+  }
+
+  handleCheckboxChange(event) {
+    this.setState({
+      [event.target.name]: event.target.checked
     });
   }
 
@@ -127,10 +153,12 @@ export default class MeetingManager extends React.Component {
       axios({
         method: 'POST',
         url: '/api/meetings',
+        withCredentials: true,
         data: {
           date: this.state.activeDate.toISOString(),
           startTime: fullStartTime.toISOString(),
-          endTime: fullEndTime.toISOString()
+          endTime: fullEndTime.toISOString(),
+          hasZoomMeeting: this.state.hasZoomMeeting
         }
       }).then((response) => {
         const { data } = response;
@@ -145,6 +173,9 @@ export default class MeetingManager extends React.Component {
           return {
             meetings: newMeetings,
             meetingId: data.newMeeting._id,
+            zoomMeetingStartLink: data.newMeeting.zoomMeetingStartLink,
+            zoomMeetingInviteLink: data.newMeeting.zoomMeetingInviteLink,
+            zoomMeetingPassword: data.newMeeting.zoomMeetingPassword,
             isMeeting: true,
             isSchedulingMeeting: false
           }
@@ -192,7 +223,8 @@ export default class MeetingManager extends React.Component {
         data: {
           date: this.state.newDate.toISOString(),
           startTime: fullStartTime.toISOString(),
-          endTime: fullEndTime.toISOString()
+          endTime: fullEndTime.toISOString(),
+          hasZoomMeeting: (this.state.zoomMeetingInviteLink ? true : false) 
         },
         withCredentials: true
       }).then((response) => {
@@ -234,7 +266,10 @@ export default class MeetingManager extends React.Component {
     axios({
       method: 'DELETE',
       url: "/api/meetings/" + this.state.meetingId,
-      withCredentials: true
+      withCredentials: true,
+      data: {
+        hasZoomMeeting: (this.state.zoomMeetingInviteLink ? true : false)
+      }
     }).then((response) => {
       const { data } = response;
       this.props.clearFlashMessages();
@@ -266,6 +301,23 @@ export default class MeetingManager extends React.Component {
   }
 
   render() {
+    let zoomDiv = null;
+    if (this.state.admin && !this.state.admin.hasZoomToken) {
+      zoomDiv = (
+        <div>
+          <p>We have detected that you are an Admin, but not signed in with Zoom. If you would like to schedule meetings with Zoom sessions, please use the button to link your Admin account with your Zoom account.</p>
+          <a id="zoom-a" href="/api/admins/auth/zoom">
+            <Button>Sign-In with Zoom <i className="fa fa-video"></i></Button>
+          </a>
+        </div>
+      );
+    } else if (this.state.admin && this.state.admin.hasZoomToken) {
+      zoomDiv = (
+        <div>
+          <p>Your Admin account is succesfully signed in with Zoom. You can proceed to schedule meetings that have Zoom.</p>
+        </div>
+      )
+    }
     let dateEditor = (
       <div className="date-editor">
         <h2>No date selected</h2>
@@ -303,6 +355,19 @@ export default class MeetingManager extends React.Component {
                   value={this.state.endTime}
                   onChange={this.handleInputChange}
                   type="time"
+                />
+              </Col>
+            </Form.Group>
+            <Form.Group as={Row} controlId="hasZoomMeeting">
+              <Form.Label column xs="2" md="2">Schedule Zoom Meeting?</Form.Label>
+              <Col xs="7" md="4">
+                <Form.Check
+                  id="hasZoomMeeting"
+                  name="hasZoomMeeting"
+                  className="form-check-input"
+                  checked={this.state.hasZoomMeeting}
+                  onChange={this.handleCheckboxChange}
+                  type="checkbox"
                 />
               </Col>
             </Form.Group>
@@ -370,6 +435,25 @@ export default class MeetingManager extends React.Component {
             </div>
           );
         }
+        let zoomStartLinkRow = null;
+        if (this.state.zoomMeetingStartLink) {
+          zoomStartLinkRow = (
+            <Form.Group as={Row} controlId="zoomMeetingStartLink">
+                <Form.Label column xs="2" md="2">Zoom Start Link</Form.Label>
+                <Col xs="7" md="4">
+                  <a
+                    target="_blank" 
+                    href={this.state.zoomMeetingStartLink}
+                  >{this.state.zoomMeetingStartLink}</a>
+                </Col>
+                <Col xs="2" md="2">
+                  <CopyToClipboard text={this.state.zoomMeetingStartLink}>
+                    <Button><i className="fa fa-clipboard"></i></Button>
+                  </CopyToClipboard>
+                </Col>
+              </Form.Group>
+          );
+        }
         content = (
           <div>
             <Form>
@@ -402,7 +486,40 @@ export default class MeetingManager extends React.Component {
                   />
                 </Col>
               </Form.Group>
-              <Form.Group as={Row} controlId="endTime">
+              {zoomStartLinkRow}
+              <Form.Group as={Row} controlId="zoomMeetingInviteLink">
+                <Form.Label column xs="2" md="2">Zoom Invite Link</Form.Label>
+                <Col xs="7" md="4">
+                  <a
+                    target="_blank" 
+                    href={this.state.zoomMeetingInviteLink}
+                  >{this.state.zoomMeetingInviteLink}</a>
+                </Col>
+                <Col xs="2" md="2">
+                  <CopyToClipboard text={this.state.zoomMeetingInviteLink}>
+                    <Button><i className="fa fa-clipboard"></i></Button>
+                  </CopyToClipboard>
+                </Col>
+              </Form.Group>
+              <Form.Group as={Row} controlId="zoomMeetingPassword">
+                <Form.Label column xs="2" md="2">Zoom Password</Form.Label>
+                <Col xs="7" md="4">
+                  <Form.Control
+                      plaintext
+                      readOnly
+                      name="zoomMeetingPassword"
+                      className="form-input"
+                      value={this.state.zoomMeetingPassword}
+                      type="text"
+                    />
+                </Col>
+                <Col xs="2" md="2">
+                  <CopyToClipboard text={this.state.zoomMeetingPassword}>
+                    <Button><i className="fa fa-clipboard"></i></Button>
+                  </CopyToClipboard>
+                </Col>
+              </Form.Group>
+              <Form.Group as={Row} controlId="attendants">
                 <Form.Label column xs="2" md="2">Attendants</Form.Label>
               </Form.Group>
               <Row>
@@ -425,32 +542,33 @@ export default class MeetingManager extends React.Component {
     }
 
     return(
-        <div className="meetings">
-          <h1>Meetings</h1>
-          <Row>
-            <Col md="5">
-              <Calendar
-                className="calendar"
-                onChange={this.handleCalendarChange}
-                tileClassName={(date, view) => {
-                  let dateHasMeeting = false;
-                  let extraClass = "";
+      <div className="meetings">
+        <h1>Meetings</h1>
+        {zoomDiv}
+        <Row>
+          <Col md="5">
+            <Calendar
+              className="calendar"
+              onChange={this.handleCalendarChange}
+              tileClassName={(date, view) => {
+                let dateHasMeeting = false;
+                let extraClass = "";
 
-                  this.state.meetings.forEach((meeting) => {
-                    if (meeting.date === date.date.toISOString()) {
-                      dateHasMeeting = true;
-                      if (new Date(meeting.endTime) < new Date()) {
-                        extraClass = "past-date";
-                      }
+                this.state.meetings.forEach((meeting) => {
+                  if (meeting.date === date.date.toISOString()) {
+                    dateHasMeeting = true;
+                    if (new Date(meeting.endTime) < new Date()) {
+                      extraClass = "past-date";
                     }
-                  });
-                  return dateHasMeeting ? "meeting " + extraClass : null;;
-                }}
-              />
-            </Col>
-          </Row>
-          {dateEditor}
-        </div>
+                  }
+                });
+                return dateHasMeeting ? "meeting " + extraClass : null;
+              }}
+            />
+          </Col>
+        </Row>
+        {dateEditor}
+      </div>
     );
   }
 }

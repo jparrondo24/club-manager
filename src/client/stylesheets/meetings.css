@@ -24,3 +24,22 @@
 table {
   margin-top: 0;
 }
+
+div p {
+  color: white;
+  font-size: 16px;
+}
+
+#zoom-a {
+  color: blue;
+}
+
+#zoom-checkbox {
+  color: black;
+}
+
+form a {
+  word-wrap: break-word;
+  overflow: hidden;
+  display: inline;
+}
