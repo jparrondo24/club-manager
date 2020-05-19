@@ -20,17 +20,7 @@ const Meeting = require('./models/Meeting.js');
 
 require('dotenv').config();
 
-if (process.env.NODE_ENV === "production") {
-  app.use(cors({
-    origin: '#',
-    optionsSuccessStatus: 200
-  }));
-  /*
-  app.use(history({
-    verbose: true
-  }));
-  */
-}
+
 app.use(sslRedirect());
 app.use(bodyParser.urlencoded());
 app.use(bodyParser.json());
@@ -97,6 +87,16 @@ app.use(validateAdminAccessToken);
 app.use('/api/students', students);
 app.use('/api/admins', admins);
 app.use('/api/meetings', meetings);
+
+if (process.env.NODE_ENV === "production") {
+  app.use(cors({
+    origin: '#',
+    optionsSuccessStatus: 200
+  }));
+  app.use(history({
+    verbose: true
+  }));
+}
 
 const uri = process.env.MONGO_URI;
 mongoose.connect(uri, { useNewUrlParser: true });
