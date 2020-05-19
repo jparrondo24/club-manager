@@ -25,9 +25,11 @@ if (process.env.NODE_ENV === "production") {
     origin: '#',
     optionsSuccessStatus: 200
   }));
+  /*
   app.use(history({
     verbose: true
   }));
+  */
 }
 app.use(sslRedirect());
 app.use(bodyParser.urlencoded());
