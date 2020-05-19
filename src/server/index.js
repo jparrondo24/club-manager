@@ -5,7 +5,6 @@ const bodyParser = require('body-parser');
 const cookieParser = require('cookie-parser');
 const cookie = require('cookie');
 const cors = require('cors');
-const history = require('connect-history-api-fallback');
 const jwt = require('jsonwebtoken');
 const sslRedirect = require('heroku-ssl-redirect');
 
@@ -93,9 +92,13 @@ if (process.env.NODE_ENV === "production") {
     origin: '#',
     optionsSuccessStatus: 200
   }));
-  app.use(history({
-    verbose: true
-  }));
+  app.get('/*', (req, res) => {
+    res.sendFile('dist/index.html', (err) => {
+      if (err) {
+        res.status(500).send(err);
+      }
+    })
+  });
 }
 
 const uri = process.env.MONGO_URI;
