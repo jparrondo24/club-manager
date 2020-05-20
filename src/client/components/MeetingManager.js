@@ -57,7 +57,9 @@ export default class MeetingManager extends React.Component {
       withCredentials: true
     }).then((response) => {
       const { data } = response;
-      this.state.admin = data.user;
+      this.setState({
+        admin: data.user
+      });
     });
   }
 
