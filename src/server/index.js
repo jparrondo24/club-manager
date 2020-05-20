@@ -7,7 +7,7 @@ const cookie = require('cookie');
 const cors = require('cors');
 const jwt = require('jsonwebtoken');
 const sslRedirect = require('heroku-ssl-redirect');
-
+const path = require('path');
 
 const students = require('./routes/students.js');
 const admins = require('./routes/admins.js');
@@ -20,12 +20,11 @@ const Meeting = require('./models/Meeting.js');
 require('dotenv').config();
 
 
-app.use(sslRedirect());
+// app.use(sslRedirect());
 app.use(bodyParser.urlencoded());
 app.use(bodyParser.json());
 app.use(cookieParser());
 app.use(express.static('dist'));
-
 
 const validateStudentAccessToken = (req, res, next) => {
   if (req.cookies.studentAccessJwt) {
@@ -87,17 +86,10 @@ app.use('/api/students', students);
 app.use('/api/admins', admins);
 app.use('/api/meetings', meetings);
 
-if (process.env.NODE_ENV === "production") {
-  app.use(cors({
-    origin: '#',
-    optionsSuccessStatus: 200
-  }));
+if (process.env.NODE_ENV === 'production') {
+  app.use(sslRedirect());
   app.get('/*', (req, res) => {
-    res.sendFile('dist/index.html', (err) => {
-      if (err) {
-        res.status(500).send(err);
-      }
-    })
+    res.sendFile(path.join(__dirname, '../../dist', 'index.html'));
   });
 }
 

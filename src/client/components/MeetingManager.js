@@ -304,16 +304,16 @@ export default class MeetingManager extends React.Component {
     let zoomDiv = null;
     if (this.state.admin && !this.state.admin.hasZoomToken) {
       zoomDiv = (
-        <div>
+        <div id="zoom-div">
           <p>We have detected that you are an Admin, but not signed in with Zoom. If you would like to schedule meetings with Zoom sessions, please use the button to link your Admin account with your Zoom account.</p>
           <a id="zoom-a" href="/api/admins/auth/zoom">
-            <Button>Sign-In with Zoom <i className="fa fa-video"></i></Button>
+            <Button id="zoom-button">Sign-In with Zoom <i className="fa fa-video"></i></Button>
           </a>
         </div>
       );
     } else if (this.state.admin && this.state.admin.hasZoomToken) {
       zoomDiv = (
-        <div>
+        <div id="zoom-div">
           <p>Your Admin account is succesfully signed in with Zoom. You can proceed to schedule meetings that have Zoom.</p>
         </div>
       )
@@ -454,6 +454,48 @@ export default class MeetingManager extends React.Component {
               </Form.Group>
           );
         }
+
+        let zoomJoinLinkRow = null;
+        let zoomPasswordRow = null;
+        if (this.state.hasZoomMeeting) {
+          zoomJoinLinkRow = (
+            <Form.Group as={Row} controlId="zoomMeetingInviteLink">
+              <Form.Label column xs="2" md="2">Zoom Invite Link</Form.Label>
+              <Col xs="7" md="4">
+                <a
+                  target="_blank" 
+                  href={this.state.zoomMeetingInviteLink}
+                >{this.state.zoomMeetingInviteLink}</a>
+              </Col>
+              <Col xs="2" md="2">
+                <CopyToClipboard text={this.state.zoomMeetingInviteLink}>
+                  <Button><i className="fa fa-clipboard"></i></Button>
+                </CopyToClipboard>
+              </Col>
+            </Form.Group>
+          );
+          zoomPasswordRow = (
+            <Form.Group as={Row} controlId="zoomMeetingPassword">
+              <Form.Label column xs="2" md="2">Zoom Password</Form.Label>
+              <Col xs="7" md="4">
+                <Form.Control
+                    plaintext
+                    readOnly
+                    name="zoomMeetingPassword"
+                    className="form-input"
+                    value={this.state.zoomMeetingPassword}
+                    type="text"
+                  />
+              </Col>
+              <Col xs="2" md="2">
+                <CopyToClipboard text={this.state.zoomMeetingPassword}>
+                  <Button><i className="fa fa-clipboard"></i></Button>
+                </CopyToClipboard>
+              </Col>
+            </Form.Group>
+          );
+        }
+
         content = (
           <div>
             <Form>
@@ -487,38 +529,8 @@ export default class MeetingManager extends React.Component {
                 </Col>
               </Form.Group>
               {zoomStartLinkRow}
-              <Form.Group as={Row} controlId="zoomMeetingInviteLink">
-                <Form.Label column xs="2" md="2">Zoom Invite Link</Form.Label>
-                <Col xs="7" md="4">
-                  <a
-                    target="_blank" 
-                    href={this.state.zoomMeetingInviteLink}
-                  >{this.state.zoomMeetingInviteLink}</a>
-                </Col>
-                <Col xs="2" md="2">
-                  <CopyToClipboard text={this.state.zoomMeetingInviteLink}>
-                    <Button><i className="fa fa-clipboard"></i></Button>
-                  </CopyToClipboard>
-                </Col>
-              </Form.Group>
-              <Form.Group as={Row} controlId="zoomMeetingPassword">
-                <Form.Label column xs="2" md="2">Zoom Password</Form.Label>
-                <Col xs="7" md="4">
-                  <Form.Control
-                      plaintext
-                      readOnly
-                      name="zoomMeetingPassword"
-                      className="form-input"
-                      value={this.state.zoomMeetingPassword}
-                      type="text"
-                    />
-                </Col>
-                <Col xs="2" md="2">
-                  <CopyToClipboard text={this.state.zoomMeetingPassword}>
-                    <Button><i className="fa fa-clipboard"></i></Button>
-                  </CopyToClipboard>
-                </Col>
-              </Form.Group>
+              {zoomJoinLinkRow}
+              {zoomPasswordRow}
               <Form.Group as={Row} controlId="attendants">
                 <Form.Label column xs="2" md="2">Attendants</Form.Label>
               </Form.Group>
