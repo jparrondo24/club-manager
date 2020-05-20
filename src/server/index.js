@@ -20,6 +20,7 @@ const Meeting = require('./models/Meeting.js');
 require('dotenv').config();
 
 if (process.env.NODE_ENV === 'production') {
+  app.enable('trust proxy');
   app.use(sslRedirect());
 }
 
