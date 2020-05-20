@@ -44,11 +44,8 @@ form a {
   display: inline;
 }
 
-#zoom-div {
-  padding-bottom: 2%;
-}
-
 #zoom-button {
   color: #0E71EB !important;
   border-color: #0E71EB !important;
+  margin-bottom: 3%;
 }

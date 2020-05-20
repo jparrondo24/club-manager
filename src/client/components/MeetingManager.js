@@ -459,7 +459,7 @@ export default class MeetingManager extends React.Component {
 
         let zoomJoinLinkRow = null;
         let zoomPasswordRow = null;
-        if (this.state.hasZoomMeeting) {
+        if (this.state.zoomMeetingInviteLink && this.state.zoomMeetingPassword) {
           zoomJoinLinkRow = (
             <Form.Group as={Row} controlId="zoomMeetingInviteLink">
               <Form.Label column xs="2" md="2">Zoom Invite Link</Form.Label>
