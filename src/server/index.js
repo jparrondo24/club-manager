@@ -19,8 +19,10 @@ const Meeting = require('./models/Meeting.js');
 
 require('dotenv').config();
 
+if (process.env.NODE_ENV === 'production') {
+  app.use(sslRedirect());
+}
 
-// app.use(sslRedirect());
 app.use(bodyParser.urlencoded());
 app.use(bodyParser.json());
 app.use(cookieParser());
@@ -87,7 +89,6 @@ app.use('/api/admins', admins);
 app.use('/api/meetings', meetings);
 
 if (process.env.NODE_ENV === 'production') {
-  app.use(sslRedirect());
   app.get('/*', (req, res) => {
     res.sendFile(path.join(__dirname, '../../dist', 'index.html'));
   });
