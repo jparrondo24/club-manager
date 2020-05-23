@@ -1,4 +1,12 @@
-h1 Meeting Reminder
-p This email is to remind you of a Coding Club meeting tomorrow, #{date}, from #{startTime}-#{endTime}
+h1 #{title}
+p #{message}
 br
-p If there is a problem with these automated emails, please contact my owner #[a( href='mailto:justinparrondo@gmail.com') Justin Parrondo].
+p #[strong Start Time: ] #{startTime}
+p #[strong End Time: ] #{endTime}
+if zoomMeetingInviteLink
+  p 
+    strong Zoom Join Link: 
+    a(href=zoomMeetingInviteLink) #{zoomMeetingInviteLink}
+if zoomMeetingPassword
+  p #[strong Zoom Password: ] #{zoomMeetingPassword}
+p #{footer}

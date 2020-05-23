@@ -1,9 +1,6 @@
 const express = require("express");
 const router = express.Router();
 const mongoose = require("mongoose");
-const mailer = require('../mailer.js');
-const CronJob = require('cron').CronJob;
-const fs = require('fs');
 const axios = require('axios');
 
 require('dotenv').config();
@@ -12,30 +9,7 @@ const Meeting = require('../models/Meeting');
 const Student = require('../models/Student.js');
 const Admin = require('../models/Admin.js');
 
-const job = new CronJob('4 23 * * *', () => {
-  const tomorrowsDate = new Date();
-  tomorrowsDate.setHours(tomorrowsDate.getHours() - 4);
-  tomorrowsDate.setDate(tomorrowsDate.getDate() + 1)
-  tomorrowsDate.setUTCHours(4, 0, 0, 0);
-  console.log(tomorrowsDate);
-  Meeting.findOne({ date: tomorrowsDate.toISOString() }, (err, meeting) => {
-    if (err) console.log(err);
-    console.log(meeting);
-    if (meeting) {
-      Student.find({}, (err, students) => {
-        if (err) console.log(err);
-        students.forEach((student) => {
-          console.log(student);
-          mailer.sendRemindMail(student.email, {
-            date: meeting.date,
-            startTime: meeting.startTime,
-            endTime: meeting.endTime
-          });
-        });
-      })
-    }
-  })
-}, null, true, 'America/New_York');
+const notifier = require('../notifier.js');
 
 router.get('/', (req, res) => {
   if (!req.student && !req.admin) {
