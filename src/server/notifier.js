@@ -102,7 +102,8 @@ const mailClient = nodemailer.createTransport(sgTransport({
     api_key: process.env.SENDGRID_API_KEY
   }
 }));
-const from = "jparrondo20255@columbushs.com";
+const from = "bot@cchs-coding.club";
+const fromname = "CCHS-Coding.club Bot";
 
 const sendEmails = async (meeting) => {
   const messageData = generateMessage(meeting);
@@ -112,6 +113,7 @@ const sendEmails = async (meeting) => {
     students.forEach((student) => {
       mailClient.sendMail({
         from: from,
+        fromname: fromname,
         to: student.email,
         subject: messageData.title,
         html: html
@@ -126,6 +128,7 @@ const sendEmails = async (meeting) => {
     admins.forEach((admin) => {
       mailClient.sendMail({
         from: from,
+        fromname: fromname,
         to: admin.email,
         subject: messageData.title,
         html: html
@@ -134,6 +137,22 @@ const sendEmails = async (meeting) => {
         console.log(info);
       });
     });
+  });
+}
+
+const sendTestEmail = async (meeting) => {
+  const messageData = generateMessage(meeting);
+  const html = pug.renderFile('src/server/emails/reminder.pug', messageData);
+
+  mailClient.sendMail({
+    from: from,
+    fromname: fromname,
+    to: "justinparrondo@gmail.com",
+    subject: messageData.title,
+    html: html
+  }, (err, info) => {
+    if (err) console.log(err);
+    console.log(info);
   });
 }
 
@@ -156,3 +175,4 @@ const notifyDailyOfMeetings = new CronJob('0 0 * * *', () => {
 
 exports.sendDiscordMessage = sendDiscordMessage;
 exports.sendEmails = sendEmails;
+exports.sendTestEmail = sendTestEmail;
