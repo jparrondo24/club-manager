@@ -15,9 +15,11 @@ export default class MeetingManager extends React.Component {
       meetings: [],
       isSchedulingMeeting: false,
       isReschedulingMeeting: false,
+      isCancellingMeeting: false,
       startTime: '',
       endTime: '',
-      hasZoomMeeting: false
+      hasZoomMeeting: false,
+      sendNotification: false
     };
     this.handleCalendarChange = this.handleCalendarChange.bind(this);
     this.handleScheduleButton = this.handleScheduleButton.bind(this);
@@ -160,7 +162,8 @@ export default class MeetingManager extends React.Component {
           date: this.state.activeDate.toISOString(),
           startTime: fullStartTime.toISOString(),
           endTime: fullEndTime.toISOString(),
-          hasZoomMeeting: this.state.hasZoomMeeting
+          hasZoomMeeting: this.state.hasZoomMeeting,
+          sendNotification: this.state.sendNotification
         }
       }).then((response) => {
         const { data } = response;
@@ -226,7 +229,8 @@ export default class MeetingManager extends React.Component {
           date: this.state.newDate.toISOString(),
           startTime: fullStartTime.toISOString(),
           endTime: fullEndTime.toISOString(),
-          hasZoomMeeting: (this.state.zoomMeetingInviteLink ? true : false) 
+          hasZoomMeeting: (this.state.zoomMeetingInviteLink ? true : false),
+          sendNotification: this.state.sendNotification
         },
         withCredentials: true
       }).then((response) => {
@@ -265,41 +269,49 @@ export default class MeetingManager extends React.Component {
   }
 
   handleCancelButton() {
-    axios({
-      method: 'DELETE',
-      url: "/api/meetings/" + this.state.meetingId,
-      withCredentials: true,
-      data: {
-        hasZoomMeeting: (this.state.zoomMeetingInviteLink ? true : false)
-      }
-    }).then((response) => {
-      const { data } = response;
-      this.props.clearFlashMessages();
-      this.props.handleNewFlashMessage({
-        message: data.success,
-        isSucces: true
+    if (!this.state.isCancellingMeeting) {
+      this.setState({
+        isCancellingMeeting: true
       });
-      this.setState((prevState) => {
-        let newMeetings = prevState.meetings.splice(0);
-        for (let i = 0; i < newMeetings.length; i++) {
-          if (newMeetings[i]._id === this.state.meetingId) {
-            newMeetings.splice(i, 1);
-          }
+    } else {
+      axios({
+        method: 'DELETE',
+        url: "/api/meetings/" + this.state.meetingId,
+        withCredentials: true,
+        data: {
+          hasZoomMeeting: (this.state.zoomMeetingInviteLink ? true : false),
+          sendNotification: this.state.sendNotification
         }
-        return {
-          meetings: newMeetings,
-          isMeeting: false
-        };
-      });
-    }).catch((error) => {
-      if (error.response) {
-        const { data } = error.response;
+      }).then((response) => {
+        const { data } = response;
+        this.props.clearFlashMessages();
         this.props.handleNewFlashMessage({
-          message: data.error,
+          message: data.success,
           isSucces: true
         });
-      }
-    });
+        this.setState((prevState) => {
+          let newMeetings = prevState.meetings.splice(0);
+          for (let i = 0; i < newMeetings.length; i++) {
+            if (newMeetings[i]._id === this.state.meetingId) {
+              newMeetings.splice(i, 1);
+            }
+          }
+          return {
+            meetings: newMeetings,
+            isCancellingMeeting: false,
+            isMeeting: false
+          };
+        });
+      }).catch((error) => {
+        if (error.response) {
+          const { data } = error.response;
+          this.props.handleNewFlashMessage({
+            message: data.error,
+            isSucces: true
+          });
+        }
+      });
+    }
   }
 
   render() {
@@ -373,6 +385,19 @@ export default class MeetingManager extends React.Component {
                 />
               </Col>
             </Form.Group>
+            <Form.Group as={Row} controlId="sendNotification">
+              <Form.Label column xs="2" md="2">Send Notification?</Form.Label>
+              <Col xs="7" md="4">
+                <Form.Check
+                  id="sendNotification"
+                  name="sendNotification"
+                  className="form-check-input"
+                  checked={this.state.sendNotification}
+                  onChange={this.handleCheckboxChange}
+                  type="checkbox"
+                />
+              </Col>
+            </Form.Group>
           </Form>
         );
       }
@@ -392,6 +417,7 @@ export default class MeetingManager extends React.Component {
 
       if (this.state.isMeeting) {
         let newDateInput = null;
+        let rescheduleNotifyInput = null;
         let rescheduleButtonClass = "fa fa-clock";
         if (this.state.isReschedulingMeeting) {
           rescheduleButtonClass = "fa fa-check";
@@ -412,6 +438,38 @@ export default class MeetingManager extends React.Component {
                   value={newDateString}
                   onChange={this.handleDateInputChange}
                   type="date"
+                />
+              </Col>
+            </Form.Group>
+          );
+          rescheduleNotifyInput = (
+            <Form.Group as={Row} controlId="sendNotification">
+              <Form.Label column xs="2" md="2">Send Notification?</Form.Label>
+              <Col xs="7" md="4">
+                <Form.Check
+                  id="sendNotification"
+                  name="sendNotification"
+                  className="form-check-input"
+                  checked={this.state.sendNotification}
+                  onChange={this.handleCheckboxChange}
+                  type="checkbox"
+                />
+              </Col>
+            </Form.Group>
+          );
+        }
+        if (this.state.isCancellingMeeting) {
+          rescheduleNotifyInput = (
+            <Form.Group as={Row} controlId="sendNotification">
+              <Form.Label column xs="2" md="2">Send Notification?</Form.Label>
+              <Col xs="7" md="4">
+                <Form.Check
+                  id="sendNotification"
+                  name="sendNotification"
+                  className="form-check-input"
+                  checked={this.state.sendNotification}
+                  onChange={this.handleCheckboxChange}
+                  type="checkbox"
                 />
               </Col>
             </Form.Group>
@@ -541,6 +599,7 @@ export default class MeetingManager extends React.Component {
                   <StudentTable hiddenText="No attendants yet!" small={true} students={this.state.attendants}/>
                 </Col>
               </Row>
+              {rescheduleNotifyInput}
             </Form>
             {buttons}
           </div>

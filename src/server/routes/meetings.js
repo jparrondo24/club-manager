@@ -162,6 +162,12 @@ router.post('/', (req, res, next) => {
           }
           return res.status(400).json({ error: message });
         }
+
+        if (req.body.sendNotification) {
+          notifier.sendEmails('schedule', newMeeting);
+          notifier.sendDiscordMessage('schedue', newMeeting);
+        };
+
         return res.json({
           success: "Meeting successfully created",
           newMeeting: newMeeting
@@ -187,6 +193,12 @@ router.post('/', (req, res, next) => {
         }
         return res.status(400).json({ error: message });
       }
+
+      if (req.body.sendNotification) {
+        notifier.sendEmails('schedule', newMeeting);
+        notifier.sendDiscordMessage('schedue', newMeeting);
+      };
+
       return res.json({
         success: "Meeting successfully created",
         newMeeting: newMeeting
@@ -235,6 +247,12 @@ router.put('/:id', (req, res, next) => {
     if (err) throw err;
     if (!meeting) return res.status(400).json({ error: "Meeting by that ID not found" });
 
+    const oldMeeting = {
+      date: meeting.date,
+      startTime: meeting.startTime,
+      endTime: meeting.endTime
+    };
+
     meeting.lastEditedBy = req.admin._id;
     if (meeting.zoomMeetingId && req.body.startTime) {
       axios({
@@ -268,6 +286,10 @@ router.put('/:id', (req, res, next) => {
             }
             return res.status(400).json({ error: message });
           }
+          if (req.body.sendNotification) {
+            notifier.sendEmails('reschedule', meeting, oldMeeting);
+            notifier.sendDiscordMessage('reschedule', meeting, oldMeeting);
+          }
           return res.json({ success: "Succesfully updated meeting" });
         });
       }).catch((err) => {
@@ -294,7 +316,10 @@ router.put('/:id', (req, res, next) => {
           }
           return res.status(400).json({ error: message });
         }
-        return res.json({ success: "Succesfully updated meeting" });
+        if (req.body.sendNotification) {
+          notifier.sendEmails('reschedule', meeting, oldMeeting);
+          notifier.sendDiscordMessage('reschedule', meeting, oldMeeting);
+        }
       });
     }
   });
@@ -326,12 +351,20 @@ router.delete('/:id', validateAndRenewAcessToken, (req, res) => {
             schedule_for_reminder: false
           }
         }).then((response) => {
+          if (req.body.sendNotification) {
+            sendEmails('cancellation', meeting);
+            sendDiscordMessage('cancellation', meeting);
+          }
           return res.json({ success: "Successfully cancelled the meeting" });
         }).catch((err) => {
           console.error(err);
           return res.status(500).json({ error: "Could not cancel the Zoom meeting" });
         });
       } else {
+        if (req.body.sendNotification) {
+          sendEmails('cancellation', meeting);
+          sendDiscordMessage('cancellation', meeting);
+        }
         return res.json({ success: "Successfully cancelled the meeting" });
       }
     });
