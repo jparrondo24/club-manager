@@ -170,7 +170,7 @@ router.get('/', (req, res) => {
         responseAdmins.push(currAdmin);
       }
       return res.json({
-        status: "noAdmintToken",
+        status: "noAdminToken",
         admins: responseAdmins
       });
     });

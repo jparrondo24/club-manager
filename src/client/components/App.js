@@ -53,7 +53,7 @@ export default class App extends React.Component {
             <Switch>
               <Route
                 exact path="/"
-                render={(props) => <Home {...props} handleNewFlashMessage={this.handleNewFlashMessage} clearFlashMessages={this.clearFlashMessages} />}
+                render={(props) => <Home {...props} handleNewFlashMessage={this.handleNewFlashMessage} clearFlashMessages={this.clearFlashMessages} model="students"/>}
               />
               <Route
                 exact path="/student/register"
@@ -70,6 +70,10 @@ export default class App extends React.Component {
               <Route
                 exact path="/student/signin"
                 render={(props) => <StudentsSignin {...props} handleNewFlashMessage={this.handleNewFlashMessage} clearFlashMessages={this.clearFlashMessages} />}
+              />
+              <Route
+                exact path="/admin"
+                render={(props) => <Home {...props} handleNewFlashMessage={this.handleNewFlashMessage} clearFlashMessages={this.clearFlashMessages} model="admins"/>}
               />
               <Route
                 exact path="/admin/register"

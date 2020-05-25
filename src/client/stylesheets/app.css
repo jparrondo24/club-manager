@@ -42,3 +42,47 @@ h1, h2, h3, p, button {
 .button-group button {
   margin-top: 10px;
 }
+
+.header img {
+  max-height: 100px;
+}
+
+.header {
+  margin-bottom: 2%;
+}
+
+.header h1 {
+  font-size: 40px;
+}
+
+.header h2 {
+  font-size: 20px;
+}
+
+.footer {
+  margin-top: 8%;
+}
+
+.footer .row {
+  padding-bottom: 10px;
+}
+
+.footer h2 {
+  font-size: 20px;
+}
+
+.footer h2 i {
+  font-size: 40px;
+}
+
+.v-divider {
+  border-right: 1px solid;
+}
+
+#discord-row, #discord-row h2, #discord-row a {
+  color: #7289DA;
+}
+
+#instagram-row, #instagram-row h2, #instagram-row a {
+  color: #F56040;
+}

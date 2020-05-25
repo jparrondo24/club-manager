@@ -1,6 +1,7 @@
 const path = require('path');
 const HtmlWebpackPlugin = require('html-webpack-plugin');
-const CleanWebpackPlugin = require('clean-webpack-plugin');
+const { CleanWebpackPlugin } = require('clean-webpack-plugin');
+const FaviconsWebpackPlugin = require('favicons-webpack-plugin');
 const webpack = require('webpack');
 const outputDirectory = 'dist';
 require('dotenv').config();
@@ -43,11 +44,13 @@ module.exports = {
     }
   },
   plugins: [
-    new CleanWebpackPlugin([outputDirectory]),
+    new CleanWebpackPlugin({
+      cleanAfterEveryBuildPatterns: ['dist']
+    }),
     new HtmlWebpackPlugin({
       template: './public/index.html',
-      favicon: './public/favicon.ico'
     }),
+    new FaviconsWebpackPlugin('./public/explorer-hacks.jpg'),
     new webpack.DefinePlugin({
       'process.env.MY_URL': JSON.stringify(process.env.MY_URL),
       'process.env.PORT': JSON.stringify(process.env.PORT)

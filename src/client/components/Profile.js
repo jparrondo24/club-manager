@@ -154,13 +154,21 @@ export default class Profile extends React.Component {
       withCredentials: true
     }).then((response) => {
       const { data } = response;
-      if (data.status == "noStudentToken") {
+      if (data.status == "noStudentToken" || data.status == "noAdminToken") {
         this.props.handleNewFlashMessage({
           message: "You are not signed in!",
           isSuccess: false
         });
-        this.props.history.push('/' + this.props.model.slice(0, -1) + '/login');
+        if (this.props.model == 'students') {
+          this.props.history.push('/');
+        } else if (this.props.model == 'admins') {
+          console.log("here");
+          this.props.history.push('/' + this.props.model.slice(0, -1));
+        }
       } else {
+        if (data.user.hasZoomToken) {
+          delete data.user.hasZoomToken;
+        }
         this.setState(data);
       }
     }).catch((err) => {
@@ -261,7 +269,7 @@ export default class Profile extends React.Component {
         </Form>
         <Button onClick={this.handleDeleteClick} className="profile-button">Delete Account <i className="fa fa-warning"></i></Button>
         <br />
-        <Link to="/">
+        <Link to={this.props.model == 'admins' ? '/admin' : '/'}>
           <Button id="home-button">Go Back Home <i className="fa fa-home"></i></Button>
         </Link>
       </div>

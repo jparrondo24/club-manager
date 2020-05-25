@@ -1,6 +1,6 @@
 import React from 'react';
 import axios from 'axios';
-import Calendar from 'react-calendar/dist/entry.nostyle';
+import Calendar from 'react-calendar';
 import { Row, Col, Button, Form } from 'react-bootstrap';
 import { Link } from 'react-router-dom';
 import { CopyToClipboard } from 'react-copy-to-clipboard';
@@ -49,7 +49,7 @@ export default class MeetingManager extends React.Component {
           isSuccess: false
         });
         if (data.status === 'notAuthorized') {
-          this.props.history.push('/student/login');
+          this.props.history.push('/');
         }
       }
     });
