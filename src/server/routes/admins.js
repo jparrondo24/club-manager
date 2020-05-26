@@ -70,8 +70,8 @@ const validateRegisterFields = (req, res, next) => {
 
   if (!req.body.name) {
     return res.status(400).json({ error: "Name is required" });
-  } else if (!req.body.email || !emailRegex.test(req.body.email)) {
-    return res.status(400).json({ error: "Invalid email" });
+  } else if (!req.body.email || !emailRegex.test(req.body.email) || req.body.email.indexOf('@columbushs.com') == -1) {
+    return res.status(400).json({ error: "Invalid Columbus email" });
   } else if (!req.body.password || !passwordRegex.test(req.body.password)) {
     return res.status(400).json({ error: "Password must be at least 8 characters, with at least one letter and one number" });
   } else {

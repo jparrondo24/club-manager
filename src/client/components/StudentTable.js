@@ -1,5 +1,6 @@
 import React from 'react';
-import { Table } from 'react-bootstrap';
+import { Table, Button } from 'react-bootstrap';
+import { CopyToClipboard } from 'react-copy-to-clipboard';
 import '../stylesheets/studenttable.css';
 
 export default class StudentTable extends React.Component {
@@ -11,7 +12,6 @@ export default class StudentTable extends React.Component {
         <tr key={student._id}>
           <th>{student.name}</th>
           <th>{student.email}</th>
-          <th>{student.group ? student.group : "None yet"}</th>
         </tr>
       );
     });
@@ -20,19 +20,41 @@ export default class StudentTable extends React.Component {
         <p className="hidden-text">{this.props.hiddenText}</p>
       );
     } else {
+      let copyButtonDiv = null;
+      if (this.props.includeButtons && this.props.students.length != 0) {
+        let nameString = this.props.students[0].name;
+        let emailString = this.props.students[0].email;
+
+        for (let i = 1; i < this.props.students.length; i++) {
+          nameString += ("\n" + this.props.students[i].name);
+          emailString += (', ' + this.props.students[i].email);
+        }
+        copyButtonDiv = (
+          <div className="text-center copy-buttons">
+            <CopyToClipboard text={nameString}>
+              <Button>Copy Names <i className="fa fa-user"></i></Button>
+            </CopyToClipboard>
+            <CopyToClipboard text={emailString}>
+              <Button>Copy Emails <i className="fa fa-envelope"></i></Button>
+            </CopyToClipboard>
+          </div>
+        );
+      }
       return (
-        <Table size={this.props.small ? "sm" : "" } responsive bordered>
-          <thead>
-            <tr>
-              <th>Name</th>
-              <th>Email</th>
-              <th>Group</th>
-            </tr>
-          </thead>
-          <tbody>
-            {tableRows}
-          </tbody>
-        </Table>
+        <div className="student-table">
+          {copyButtonDiv}
+          <Table size={this.props.small ? "sm" : "" } responsive bordered>
+            <thead>
+              <tr>
+                <th>Name</th>
+                <th>Email</th>
+              </tr>
+            </thead>
+            <tbody>
+              {tableRows}
+            </tbody>
+          </Table>
+        </div>
       );
     }
   }

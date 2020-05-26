@@ -11,6 +11,7 @@ import Home from './Home';
 import FlashMessage from './FlashMessage';
 import Profile from './Profile';
 import MeetingManager from './MeetingManager';
+import Roster from './Roster';
 
 import '../stylesheets/app.css';
 
@@ -54,6 +55,10 @@ export default class App extends React.Component {
               <Route
                 exact path="/"
                 render={(props) => <Home {...props} handleNewFlashMessage={this.handleNewFlashMessage} clearFlashMessages={this.clearFlashMessages} model="students"/>}
+              />
+              <Route
+                exact path="/roster"
+                render={(props) => <Roster {...props} handleNewFlashMessage={this.handleNewFlashMessage} clearFlashMessages={this.clearFlashMessages} />}
               />
               <Route
                 exact path="/student/register"

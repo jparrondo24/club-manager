@@ -178,7 +178,7 @@ export default class Profile extends React.Component {
           message: data.error,
           isSuccess: false
         });
-        this.props.history.push('/' + this.props.model.slice(0, -1) + '/login');
+        this.props.history.push('/' + this.props.model.slice(0, -1));
       }
     });
   }

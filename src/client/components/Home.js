@@ -54,18 +54,18 @@ export default class Home extends React.Component {
     const footer = (
       <div className="footer">
         <div id="discord-row" className="row">
-          <div className="col-2 col-lg-1 v-divider text-center">
+          <div className="col-2 col-lg-1 v-divider align-self-center text-center">
             <h2><i className="fab fa-discord"></i></h2>
           </div>
-          <div className="col-8 align-self-center">
+          <div className="col-10 align-self-center">
             <h2><a href="https://discord.gg/YX7KQHq" target="_blank">Coding and Cybersecurity Clubs</a></h2>
           </div>
         </div>
         <div id="instagram-row" className="row">
-          <div className="col-2 col-lg-1 v-divider text-center">
+          <div className="col-2 col-lg-1 v-divider align-self-center text-center">
             <h2><i className="fab fa-instagram"></i></h2>
           </div>
-          <div className="col-8 align-self-center">
+          <div className="col-10 align-self-center">
             <h2><a href="https://instagram.com/explorershack?igshid=1fmp2w7jfql0w" target="_blank">ExplorerHacks</a></h2>
           </div>
         </div>
@@ -90,6 +90,14 @@ export default class Home extends React.Component {
         </div>
       );
     } else {
+      let rosterButton = null; 
+      if (this.props.model == 'admins') {
+        rosterButton = (
+          <Link to={'/roster'}>
+            <Button>View Roster <i className="fa fa-users"></i></Button>
+          </Link>
+        );
+      }
       return (
         <div className="home">
           {header}
@@ -107,6 +115,8 @@ export default class Home extends React.Component {
             <Link to={'/' + singularModel + '/signin'}>
               <Button>Meeting Sign-in <i className="fa fa-clipboard"></i></Button>
             </Link>
+            <br />
+            {rosterButton}
             {footer}
           </div>
         </div>
