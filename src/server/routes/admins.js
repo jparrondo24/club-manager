@@ -14,14 +14,20 @@ router.get('/auth/zoom', (req, res) => {
   if (!req.admin) {
     return res.status(403).json({ error: "Only Admins may sign into Zoom" });
   }
-  res.redirect(url.format({
-    pathname: 'https://zoom.us/oauth/authorize',
-    query: {
-      response_type: 'code',
-      redirect_uri: req.protocol + "://" + req.headers.host + '/api/admins/auth/zoom/callback',
-      client_id: process.env.ZOOM_CLIENT_ID
-    }
-  }));
+
+  Admin.findOne({ zoomAccessToken: { $exists: true }}, (err, admin) => {
+    if (err) throw err;
+    if (admin) return res.status(403).json({ error: "Another Admin has already provided his Zoom credentials" });
+
+    res.redirect(url.format({
+      pathname: 'https://zoom.us/oauth/authorize',
+      query: {
+        response_type: 'code',
+        redirect_uri: req.protocol + "://" + req.headers.host + '/api/admins/auth/zoom/callback',
+        client_id: process.env.ZOOM_CLIENT_ID
+      }
+    }));
+  });
 });
 
 router.get('/auth/zoom/callback', (req, res) => {
@@ -57,10 +63,26 @@ router.get('/auth/zoom/callback', (req, res) => {
       admin.save((err) => {
         if (err) throw err;
         res.redirect('/meetings');
-      })
+      });
     });
   }).catch((err) => {
     return res.status(500).json({ error: "Could not access the access token, most likely due to bad environment variables" })
+  });
+});
+
+router.get('/zoom-status', (req, res) => {
+  if (!req.admin) {
+    return res.status(403).json({ error: "You must be an admin to sign into Zoom", status: 'notAdmin' });
+  }
+
+  Admin.findOne({ zoomAccessToken: { $exists: true }}, (err, admin) => {
+    if (err) throw err;
+
+    if (admin) {
+      return res.json({ adminHasToken: true, adminName: admin.name });
+    } else {
+      return res.json({ adminHasToken: false });
+    }
   });
 })
 

@@ -61,45 +61,44 @@ router.get('/:id', (req, res) => {
 
 const validateAndRenewAcessToken = (req, res, next) => {
   if (req.body.hasZoomMeeting) {
-    if (!req.admin.zoomAccessToken) {
-      return res.status(400).json({ error: 'Your Admin account is not linked with a Zoom account!' });
-    }
+    Admin.findOne({ zoomAccessToken: { $exists: true }}, (err, admin) => {
+      if (err) throw err;
+      if (!admin) return res.status(403).json({ error: "No Admin has logged in with Zoom to use their account to schedule Zoom meetings." });
 
-    if (new Date() >= new Date(req.admin.zoomTokenExpireTime)) {
-      const authHeader = Buffer.from(process.env.ZOOM_CLIENT_ID + ":" + process.env.ZOOM_CLIENT_SECRET).toString('base64');
-      axios({
-        method: 'POST',
-        url: 'https://zoom.us/oauth/token',
-        params: {
-          grant_type: 'refresh_token',
-          refresh_token: req.admin.zoomRefreshToken
-        },
-        headers: {
-          'Authorization' : "Basic " + authHeader
-        }
-      }).then((response) => {
-        const { data } = response;
-        Admin.findById(req.admin.id, (err, admin) => {
-          if (err) throw err;
+      if (new Date() >= new Date(admin.zoomTokenExpireTime)) {
+        const authHeader = Buffer.from(process.env.ZOOM_CLIENT_ID + ":" + process.env.ZOOM_CLIENT_SECRET).toString('base64');
+        axios({
+          method: 'POST',
+          url: 'https://zoom.us/oauth/token',
+          params: {
+            grant_type: 'refresh_token',
+            refresh_token: admin.zoomRefreshToken
+          },
+          headers: {
+            'Authorization' : "Basic " + authHeader
+          }
+        }).then((response) => {
+          const { data } = response;
           admin.zoomAccessToken = data.access_token;
           admin.zoomRefreshToken = data.refresh_token;
-    
+      
           let expireTime = new Date();
           expireTime.setSeconds(expireTime.getSeconds() + 3500);
           admin.zoomTokenExpireTime = expireTime.toISOString();
-          
+            
           admin.save((err) => {
             if (err) throw err;
-            req.admin = admin;
+            req.zoomAdmin = admin;
             return next();
           });
+        }).catch((err) => {
+          return res.status(403).json({ error: "The Admin's Zoom access token was expiring but could not be refreshed. Their account may have been deleted or they might have revoked access to CCHS Coding Club Manager" });
         });
-      }).catch((err) => {
-        return res.status(403).json({ error: "Your Zoom access token was expiring but could not be refreshed. Your account may have been deleted or you might have revoked access to CCHS Coding Club Manager" });
-      });
-    } else {
-      return next();
-    }
+      } else {
+        req.zoomAdmin = admin;
+        return next();
+      }
+    });
   } else {
     return next();
   }
@@ -131,13 +130,16 @@ router.post('/', (req, res, next) => {
       method: 'POST',
       url: 'https://api.zoom.us/v2/users/me/meetings',
       headers: {
-        'Authorization' : "Bearer " + req.admin.zoomAccessToken
+        'Authorization' : "Bearer " + req.zoomAdmin.zoomAccessToken
       },
       data: {
         topic: "Coding and Cybersecurity Club",
         type: 2,
         start_time: req.body.startTime,
-        timezone: 'UTC'
+        timezone: 'UTC',
+        settings: {
+          join_before_host: true
+        }
       }
     }).then((response) => {
       const { data } = response;
@@ -259,7 +261,7 @@ router.put('/:id', (req, res, next) => {
         method: 'PATCH',
         url: 'https://api.zoom.us/v2/meetings/' + meeting.zoomMeetingId,
         headers: {
-          'Authorization' : "Bearer " + req.admin.zoomAccessToken
+          'Authorization' : "Bearer " + req.zoomAdmin.zoomAccessToken
         },
         data: {
           start_time: req.body.startTime,
@@ -345,7 +347,7 @@ router.delete('/:id', validateAndRenewAcessToken, (req, res) => {
           method: 'DELETE',
           url: 'https://api.zoom.us/v2/meetings/' + meeting.zoomMeetingId,
           headers: {
-            'Authorization' : "Bearer " + req.admin.zoomAccessToken
+            'Authorization' : "Bearer " + req.zoomAdmin.zoomAccessToken
           },
           data: {
             schedule_for_reminder: false

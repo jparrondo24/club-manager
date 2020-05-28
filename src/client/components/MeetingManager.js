@@ -19,7 +19,10 @@ export default class MeetingManager extends React.Component {
       startTime: '',
       endTime: '',
       hasZoomMeeting: false,
-      sendNotification: false
+      sendNotification: false,
+      adminHasToken: false,
+      isAdmin: false,
+      adminName: ''
     };
     this.handleCalendarChange = this.handleCalendarChange.bind(this);
     this.handleScheduleButton = this.handleScheduleButton.bind(this);
@@ -55,13 +58,22 @@ export default class MeetingManager extends React.Component {
     });
     axios({
       method: 'GET',
-      url: '/api/admins',
+      url: '/api/admins/zoom-status',
       withCredentials: true
     }).then((response) => {
       const { data } = response;
-      this.setState({
-        admin: data.user
-      });
+      this.setState(data);
+      this.setState({ isAdmin: true });
+    }).catch((error) => {
+      if (error.response) {
+        const { data } = error.response;
+        if (data.status != 'notAdmin') {
+          this.props.handleNewFlashMessage({
+            message: data.error,
+            isSuccess: false
+          });
+        }
+      }
     });
   }
 
@@ -316,22 +328,24 @@ export default class MeetingManager extends React.Component {
 
   render() {
     let zoomDiv = null;
-    if (this.state.admin && !this.state.admin.hasZoomToken) {
+    if (!this.state.adminHasToken && this.state.isAdmin) {
       zoomDiv = (
         <div id="zoom-div">
-          <p>We have detected that you are an Admin, but not signed in with Zoom. If you would like to schedule meetings with Zoom sessions, please use the button to link your Admin account with your Zoom account.</p>
+          <p>No Admin yet has logged in with Zoom to allow other Admins to schedule Zoom meetings. We have detected that you are an Admin, would you like to log in with Zoom? All meetings scheduled by you or other Admins would appear on your Zoom account, but your participation would not be necessary for every meeting. </p>
           <a id="zoom-a" href="/api/admins/auth/zoom">
             <Button id="zoom-button">Sign-In with Zoom <i className="fa fa-video"></i></Button>
           </a>
         </div>
       );
-    } else if (this.state.admin && this.state.admin.hasZoomToken) {
+    } else if (this.state.isAdmin) {
       zoomDiv = (
         <div id="zoom-div">
-          <p>Your Admin account is succesfully signed in with Zoom. You can proceed to schedule meetings that have Zoom.</p>
+          <p>The Admin {this.state.adminName} has successfully logged in with their Zoom account, so all Admins may now schedule club meetings that have Zoom with their account. If you are that Admin and would like to log out of Zoom, visit 
+             your <Link to='/admin/profile'>Profile</Link> page.</p>
         </div>
-      )
+      );
     }
+
     let dateEditor = (
       <div className="date-editor">
         <h2>No date selected</h2>
