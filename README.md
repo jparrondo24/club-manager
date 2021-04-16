@@ -46,17 +46,30 @@ npm run start
 
 ### Pages
 **/** &emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp; Student home page
+
 **/student/register**&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;Registration for students
+
 **/student/login**&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;  Login for students
+
 **/student/profile**     &emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;  Profile view/editor for students
+
 **/student/signin** &emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&ensp;Where students go to sign into the current day's meeting
 
+
 **/admin**&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&ensp;Admin home page
+
 **/admin/register**&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&ensp;Admin regsistration (requiring the master password)
+
 **/admin/login**&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&ensp; Admin login
+
 **/admin/profile**&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;Profile view/editor for admins
+
 **/admin/signin**&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;Where admins go to display the code necessary for students to sign-in to the current day's meeting
+
 &emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&ensp;(to be displayed on a smart board and/or screenshared over Zoom)
 
+
+
 **/meetings**&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&ensp; Where both students and admins go to see scheduled meetings on the calendar
+
 &emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp; (admins can schedule new meetings)
