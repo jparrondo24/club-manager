@@ -64,7 +64,9 @@ npm run start
 
 **/admin/profile**&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;Profile view/editor for admins
 
-**/admin/signin**&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;Where admins go to display the code necessary for students to sign-in to the current day's meeting
+**/admin/signin**&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;Where admins go to display the code
+
+&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;necessary for students to sign-in to the current day's meeting
 
 &emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&ensp;(to be displayed on a smart board and/or screenshared over Zoom)
 
